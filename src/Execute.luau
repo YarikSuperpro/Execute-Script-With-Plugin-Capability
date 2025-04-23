@@ -61,7 +61,7 @@ end
 
 local function hsvChangeEffect(Grab:GuiButton,Set:Frame):()
 	local h,s,v = Grab.BackgroundColor3:ToHSV()
-	Set.BackgroundColor3=Color3.fromHSV(h,s,math.abs(1-v))
+	Set.BackgroundColor3=Color3.fromHSV(h,s,1-v)
 end
 local UI_Zero = UDim2.new(0,0,0,0)
 local UI_One = UDim2.new(1,0,1,0)
@@ -134,6 +134,18 @@ local function HowerEffect(self:GuiButton):()
 	Effect.Parent=self
 end
 
+local function CreatePathToFile(obj:Instance):string
+	local parent:Instance? = obj
+	local path = ""
+	while parent~=nil and parent~=game do
+		path=`["{parent}"]{path}`
+		parent=parent.Parent
+	end
+	path=`game{path}`
+	if obj.Parent==nil then path="nil" end
+	return path
+end
+
 local Frame = InstanceBuilder({
 	Type="Frame";
 	AnchorPoint=Vector2.new(0.5,0.5);
@@ -171,7 +183,7 @@ local Frame = InstanceBuilder({
 					if source==nil then warn("Please select target first!") return end
 					if typeof(source)~="Instance" then return end
 					source=source::ScriptType_custom
-					local str:string = `local script = game.{source:GetFullName()}\n{source.Source}`
+					local str:string = `local script = {CreatePathToFile(source)}\n{source.Source}`
 					local code = loadstring(str,"PluginPerms:")
 					if code~=nil then
 						code()
