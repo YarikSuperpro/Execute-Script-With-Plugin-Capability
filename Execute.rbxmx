@@ -1,7 +1,7 @@
 <roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
 	<External>null</External>
 	<External>nil</External>
-	<Item class="Script" referent="RBXA69A430D806F45618A58084E4639E1B0">
+	<Item class="Script" referent="RBX1901D0E8B6594AC58E6B73CDE5A7F36D">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -74,7 +74,7 @@ end
 
 local function hsvChangeEffect(Grab:GuiButton,Set:Frame):()
 	local h,s,v = Grab.BackgroundColor3:ToHSV()
-	Set.BackgroundColor3=Color3.fromHSV(h,s,math.abs(1-v))
+	Set.BackgroundColor3=Color3.fromHSV(h,s,1-v)
 end
 local UI_Zero = UDim2.new(0,0,0,0)
 local UI_One = UDim2.new(1,0,1,0)
@@ -147,6 +147,18 @@ local function HowerEffect(self:GuiButton):()
 	Effect.Parent=self
 end
 
+local function CreatePathToFile(obj:Instance):string
+	local parent:Instance? = obj
+	local path = ""
+	while parent~=nil and parent~=game do
+		path=`["{parent}"]{path}`
+		parent=parent.Parent
+	end
+	path=`game{path}`
+	if obj.Parent==nil then path="nil" end
+	return path
+end
+
 local Frame = InstanceBuilder({
 	Type="Frame";
 	AnchorPoint=Vector2.new(0.5,0.5);
@@ -184,7 +196,7 @@ local Frame = InstanceBuilder({
 					if source==nil then warn("Please select target first!") return end
 					if typeof(source)~="Instance" then return end
 					source=source::ScriptType_custom
-					local str:string = `local script = game.{source:GetFullName()}\n{source.Source}`
+					local str:string = `local script = {CreatePathToFile(source)}\n{source.Source}`
 					local code = loadstring(str,"PluginPerms:")
 					if code~=nil then
 						code()
@@ -301,7 +313,7 @@ end)
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="ModuleScript" referent="RBX7FB4E18A109441C6AA46EFE2CA264188">
+		<Item class="ModuleScript" referent="RBX687E88F334274E6095BF2DA9EB790E72">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
