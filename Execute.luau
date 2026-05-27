@@ -1,0 +1,270 @@
+--!strict
+--!optimize 2
+--!native
+
+--#include <stdraw.luau>
+local SetProperty = select(2,xpcall(function():()
+	(game::any)[nil]=nil
+end,function():()
+	return debug.info(2,"f")
+end))::(ins:Instance,prop:string,val:any)->()
+local GetProperty = select(2,xpcall(function():()
+	return (game::any)[nil]
+end,function():()
+	return debug.info(2,"f")
+end))::(ins:Instance,prop:string)->any
+local GetService = GetProperty(game,"GetService")::(DataModel:DataModel,service:string)->Instance
+--\include
+
+local ScriptEditorService = GetService(game,"ScriptEditorService")::ScriptEditorService
+local Selection = GetService(game,"Selection")::Selection
+local TestService = GetService(game,"TestService")::TestService
+local Get_Selection = GetProperty(Selection,"Get")::(service:Selection)->{Instance}
+local TweenService = GetService(game,"TweenService")::TweenService
+local Message = GetProperty(TestService,"Message")::(TestService,text: string, source: Instance?, line: number?)->()
+
+local TweenService_Create = GetProperty(TweenService,"Create")::(TweenService,instance: Instance, tweenInfo: TweenInfo, propertyTable: { [string]: any })-> Tween
+local GetEditorSource = GetProperty(ScriptEditorService,"GetEditorSource")::(service:ScriptEditorService,script:LuaSourceContainer)->string
+local UpdateSourceAsync = GetProperty(ScriptEditorService,"UpdateSourceAsync")::(service:ScriptEditorService,script:LuaSourceContainer,callback: any)->()
+
+local _settings = (settings::any)()
+local Studio = GetProperty((settings::any)()::Instance,"Studio")::Studio
+local StudioTheme = GetProperty(Studio,"Theme")::StudioTheme
+local GetColor = GetProperty(StudioTheme,"GetColor")::(theme:StudioTheme,styleguideitem: Enum.StudioStyleGuideColor, modifier: Enum.StudioStyleGuideModifier?)-> Color3
+
+
+local Tab = GetColor(StudioTheme,Enum.StudioStyleGuideColor.Tab)
+local BrightText = GetColor(StudioTheme,Enum.StudioStyleGuideColor.BrightText)
+
+local Widget = plugin:CreateDockWidgetPluginGuiAsync("Execute PluginPerms",DockWidgetPluginGuiInfo.new(
+	Enum.InitialDockState.Float,
+	false,
+	false,
+	300,--StartingX
+	300,--StartingY
+	50,--MinW
+	50--MinH
+	))
+SetProperty(Widget,"Title","Plugin Perms Menu")
+
+
+local TargetToExecute:LuaSourceContainer? = nil
+local topbar:PluginToolbar = plugin:CreateToolbar("ExecutePluginPerms")
+local button = topbar:CreateButton("OpenPluginPermsMeny","Open UI","rbxassetid://6709885837")
+local Plugin_Unloading = GetProperty(plugin,"Unloading")
+local Connect = Plugin_Unloading.Connect::(signal:RBXScriptSignal,func:any)->RBXScriptConnection
+local Destroy = GetProperty(plugin,"Destroy")::(ins:Instance)->()
+local IsA = GetProperty(plugin,"IsA")::(Instance,string)->boolean
+local GetFullName = GetProperty(plugin,"GetFullName")::(Instance)->string
+local GetAttributes = GetProperty(plugin,"GetAttributes")::(Instance)->{[string]:any}
+local SetAttribute = GetProperty(plugin,"SetAttribute")::(Instance,attribute: string, value: any)->()
+local GetTags = GetProperty(plugin,"GetTags")::(Instance)->{string}
+local AddTag = GetProperty(plugin,"AddTag")::(Instance,tag:string)->()
+
+local temp = Instance.new("Sound")
+local Play = GetProperty(temp,"Play")::(Sound)->()
+
+Destroy(temp)
+
+Connect(GetProperty(button,"Click"),function()
+	SetProperty(Widget,"Enabled", not GetProperty(Widget,"Enabled")::boolean)
+end)
+
+local UDim2_one = UDim2.fromScale(1,1)
+local UDim2_Zero = UDim2.fromScale(0,0)
+
+--For enter
+local infoTW_Enter = TweenInfo.new(0.5,Enum.EasingStyle.Back)
+local infoTW_Leave = TweenInfo.new(0.35,Enum.EasingStyle.Quart)
+--Prop
+local prop_Enter = {Size=UDim2_one}
+local prop_Leave = {Size=UDim2_Zero}
+
+
+local PlayClickSFX = function():()
+	local sound = Instance.new("Sound")
+	SetProperty(sound,"Volume",0.5)
+	SetProperty(sound,"SoundId","rbxassetid://17208396156")
+	task.delay(10,Destroy,sound)
+	SetProperty(sound,"Parent",Widget)
+	Play(sound)
+end
+
+local function HowerEffect(self:GuiButton):()
+
+end
+
+local Vector2_Half = Vector2.new(0.5,0.5)
+local UDim2_Half = UDim2.fromScale(0.5,0.5)
+local Color3_White = Color3.new(1,1,1)
+
+local Frame = Instance.new("Frame")
+SetProperty(Frame,"BackgroundColor3",Tab)
+SetProperty(Frame,"Size",UDim2_one)
+SetProperty(Frame,"BorderSizePixel",0)
+
+local Run = Instance.new("ImageButton")
+SetProperty(Run,"AnchorPoint",Vector2_Half)
+SetProperty(Run,"BackgroundTransparency",1)
+SetProperty(Run,"Image","rbxassetid://4998267428")
+SetProperty(Run,"ImageTransparency",0.3)
+SetProperty(Run,"Size",UDim2_Half)
+SetProperty(Run,"Position",UDim2.new(0.25,0,0.25,0))
+SetProperty(Run,"ZIndex",2)
+Instance.new("UIAspectRatioConstraint",Run)
+SetProperty(Run,"Parent",Frame)
+
+Connect(GetProperty(Run,"MouseButton1Click"),PlayClickSFX)
+local Effect:Frame = Instance.new("Frame")
+SetProperty(Effect,"BackgroundTransparency",0.35)
+SetProperty(Effect,"AnchorPoint",Vector2_Half)
+SetProperty(Effect,"Position",UDim2_Half)
+SetProperty(Effect,"BorderSizePixel",0)
+SetProperty(Effect,"Size",UDim2_Zero)
+--tw Enter
+--tw2 leave
+local tw  = TweenService_Create(TweenService,Effect,infoTW_Enter,prop_Enter)
+local Tween_Play = GetProperty(tw,"Play")::(Tween)->()
+local tw2 = TweenService_Create(TweenService,Effect,infoTW_Leave,prop_Leave)
+Connect(GetProperty(Run,"MouseEnter"),function()
+	Tween_Play(tw)
+	local sound = Instance.new("Sound")
+	SetProperty(sound,"Volume",0.5)
+	SetProperty(sound,"SoundId","rbxassetid://10066931761")
+	SetProperty(sound,"Parent",Widget)
+	Play(sound)
+	task.wait(10)
+	Destroy(sound)
+end)
+Connect(GetProperty(Run,"MouseLeave"),function()
+	Tween_Play(tw2)
+	local sound = Instance.new("Sound")
+	SetProperty(sound,"Volume",0.5)
+	SetProperty(sound,"SoundId","rbxassetid://17208343514")
+	SetProperty(sound,"Parent",Widget)
+	Play(sound)
+	task.wait(10)
+	Destroy(sound)
+end)
+
+SetProperty(Effect,"Parent",Run)
+
+
+
+Connect(GetProperty(Run,"MouseButton1Click"),function()
+	local Target = TargetToExecute
+	if not Target then warn("PluginPermsExecute: Please select target first!") return end
+	local src = GetEditorSource(ScriptEditorService,Target)
+	_G.PluginPermsExecuteScript = Target
+	local script = Instance.new("ModuleScript")
+	task.defer(Destroy,script)
+	SetProperty(script,"Archivable",false)
+	SetProperty(script,"Name",GetProperty(Target,"Name"))
+	for i,v in GetAttributes(Target) do
+		SetAttribute(script,i,v)
+	end
+	for _,v in GetTags(Target) do
+		AddTag(script,v)
+	end
+	src = table.concat({"local script = _G.PluginPermsExecuteScript; ",src,"\nreturn nil"})
+	UpdateSourceAsync(ScriptEditorService,script,function():string
+		return src
+	end)
+	pcall(require,script)
+end)
+
+local SetTarget = Instance.new("ImageButton")
+SetProperty(SetTarget,"AnchorPoint",Vector2_Half)
+SetProperty(SetTarget,"BackgroundTransparency",1)
+SetProperty(SetTarget,"Image","rbxassetid://997927536")
+SetProperty(SetTarget,"ImageTransparency",0.3)
+SetProperty(SetTarget,"Size",UDim2_Half)
+SetProperty(SetTarget,"Position",UDim2.new(0.75,0,0.25,0))
+SetProperty(SetTarget,"ZIndex",2)
+Instance.new("UIAspectRatioConstraint",SetTarget)
+SetProperty(SetTarget,"Parent",Frame)
+
+Connect(GetProperty(SetTarget,"MouseButton1Click"),PlayClickSFX)
+local Effect2:Frame = Instance.new("Frame")
+SetProperty(Effect2,"BackgroundTransparency",0.35)
+SetProperty(Effect2,"AnchorPoint",Vector2_Half)
+SetProperty(Effect2,"Position",UDim2_Half)
+SetProperty(Effect2,"BorderSizePixel",0)
+SetProperty(Effect2,"Size",UDim2_Zero)
+--tw Enter
+--tw2 leave
+local tw3  = TweenService_Create(TweenService,Effect2,infoTW_Enter,prop_Enter)
+local tw4 = TweenService_Create(TweenService,Effect2,infoTW_Leave,prop_Leave)
+Connect(GetProperty(SetTarget,"MouseEnter"),function()
+	Tween_Play(tw3)
+	local sound = Instance.new("Sound")
+	SetProperty(sound,"Volume",0.5)
+	SetProperty(sound,"SoundId","rbxassetid://10066931761")
+	SetProperty(sound,"Parent",Widget)
+	Play(sound)
+	task.wait(10)
+	Destroy(sound)
+end)
+Connect(GetProperty(SetTarget,"MouseLeave"),function()
+	Tween_Play(tw4)
+	local sound = Instance.new("Sound")
+	SetProperty(sound,"Volume",0.5)
+	SetProperty(sound,"SoundId","rbxassetid://17208343514")
+	SetProperty(sound,"Parent",Widget)
+	Play(sound)
+	task.wait(10)
+	Destroy(sound)
+end)
+
+SetProperty(Effect2,"Parent",SetTarget)
+
+Connect(GetProperty(SetTarget,"MouseButton1Click"),function()
+	local get = Get_Selection(Selection)[1]::LuaSourceContainer
+	if not get then warn("PluginPermsExecute: Please select something!") return end
+	if not IsA(get,"LuaSourceContainer") then warn("PluginPermsExecute: You must select a Script!") return end
+	TargetToExecute=get	
+	warn("<<"..GetFullName(get)..">> is now our Target to execute!")
+end)
+
+local T_Left = Instance.new("TextLabel")
+SetProperty(T_Left,"AnchorPoint",Vector2_Half)
+SetProperty(T_Left,"BackgroundTransparency",1)
+SetProperty(T_Left,"Text","Run")
+SetProperty(T_Left,"TextScaled",true)
+SetProperty(T_Left,"Size",UDim2_Half)
+SetProperty(T_Left,"Position",UDim2.new(0.25,0,0.75,0))
+SetProperty(T_Left,"TextColor3",BrightText)
+SetProperty(Instance.new("UIAspectRatioConstraint",T_Left),"AspectRatio",2)
+SetProperty(T_Left,"Parent",Frame)
+
+
+local T_Right = Instance.new("TextLabel")
+SetProperty(T_Right,"AnchorPoint",Vector2_Half)
+SetProperty(T_Right,"BackgroundTransparency",1)
+SetProperty(T_Right,"Text","Set Target")
+SetProperty(T_Right,"TextScaled",true)
+SetProperty(T_Right,"Size",UDim2_Half)
+SetProperty(T_Right,"Position",UDim2.new(0.75,0,0.75,0))
+SetProperty(T_Right,"TextColor3",BrightText)
+SetProperty(Instance.new("UIAspectRatioConstraint",T_Right),"AspectRatio",2)
+SetProperty(T_Right,"Parent",Frame)
+
+
+local connection = Connect(GetProperty(Studio,"ThemeChanged"),function():()
+	local StudioTheme = GetProperty(Studio,"Theme")::StudioTheme
+	local GetColor = GetProperty(StudioTheme,"GetColor")::(theme:StudioTheme,styleguideitem: Enum.StudioStyleGuideColor, modifier: Enum.StudioStyleGuideModifier?)-> Color3
+
+	local Tab = GetColor(StudioTheme,Enum.StudioStyleGuideColor.Tab)
+	local BrightText = GetColor(StudioTheme,Enum.StudioStyleGuideColor.BrightText)
+	
+	SetProperty(Frame,"BackgroundColor3",Tab)
+	SetProperty(T_Left,"TextColor3",BrightText)
+	SetProperty(T_Right,"TextColor3",BrightText)
+end)
+
+SetProperty(Frame,"Parent",Widget)
+
+
+Plugin_Unloading:Once(function()
+	connection:Disconnect()
+end)
