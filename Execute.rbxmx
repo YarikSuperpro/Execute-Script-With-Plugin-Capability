@@ -2,7 +2,7 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="Script" referent="RBX37B9BBDD50464DDDB9E43C379946EADC">
+	<Item class="Script" referent="RBX79C6E88468024B719B65D21FB933D425">
 		<Properties>
 			<ProtectedString name="Source"><![CDATA[--!strict
 --!optimize 2
@@ -162,6 +162,7 @@ Connect(GetProperty(Run,"MouseButton1Click"),function()
 	if not Target then warn("PluginPermsExecute: Please select target first!") return end
 	local src = GetEditorSource(ScriptEditorService,Target)
 	_G.PluginPermsExecuteScript = Target
+	_G.PluginPermsPlugin = plugin
 	local script = Instance.new("ModuleScript")
 	task.defer(Destroy,script)
 	SetProperty(script,"Archivable",false)
@@ -172,7 +173,7 @@ Connect(GetProperty(Run,"MouseButton1Click"),function()
 	for _,v in GetTags(Target) do
 		AddTag(script,v)
 	end
-	src = table.concat({"local script = _G.PluginPermsExecuteScript; ",src,"\nreturn nil"})
+	src = table.concat({"local script = _G.PluginPermsExecuteScript;local plugin = _G.PluginPermsPlugin; ",src,"\nreturn nil"})
 	UpdateSourceAsync(ScriptEditorService,script,function():string
 		return src
 	end)
@@ -262,7 +263,7 @@ local connection = Connect(GetProperty(Studio,"ThemeChanged"),function():()
 
 	local Tab = GetColor(StudioTheme,Enum.StudioStyleGuideColor.Tab)
 	local BrightText = GetColor(StudioTheme,Enum.StudioStyleGuideColor.BrightText)
-	
+
 	SetProperty(Frame,"BackgroundColor3",Tab)
 	SetProperty(T_Left,"TextColor3",BrightText)
 	SetProperty(T_Right,"TextColor3",BrightText)
@@ -277,8 +278,8 @@ end)
 ]]></ProtectedString>
 			<bool name="Disabled">false</bool>
 			<Content name="LinkedSource"><null></null></Content>
-			<token name="RunContext">3</token>
-			<string name="ScriptGuid">{1FEF6C9E-54EC-41AD-B418-0EEFCB7E1DA4}</string>
+			<token name="RunContext">0</token>
+			<string name="ScriptGuid">{FCF83797-8556-4D67-809E-4A96D5E832D7}</string>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 			<bool name="DefinesCapabilities">false</bool>

@@ -156,6 +156,7 @@ Connect(GetProperty(Run,"MouseButton1Click"),function()
 	if not Target then warn("PluginPermsExecute: Please select target first!") return end
 	local src = GetEditorSource(ScriptEditorService,Target)
 	_G.PluginPermsExecuteScript = Target
+	_G.PluginPermsPlugin = plugin
 	local script = Instance.new("ModuleScript")
 	task.defer(Destroy,script)
 	SetProperty(script,"Archivable",false)
@@ -166,7 +167,7 @@ Connect(GetProperty(Run,"MouseButton1Click"),function()
 	for _,v in GetTags(Target) do
 		AddTag(script,v)
 	end
-	src = table.concat({"local script = _G.PluginPermsExecuteScript; ",src,"\nreturn nil"})
+	src = table.concat({"local script = _G.PluginPermsExecuteScript;local plugin = _G.PluginPermsPlugin; ",src,"\nreturn nil"})
 	UpdateSourceAsync(ScriptEditorService,script,function():string
 		return src
 	end)
@@ -256,7 +257,7 @@ local connection = Connect(GetProperty(Studio,"ThemeChanged"),function():()
 
 	local Tab = GetColor(StudioTheme,Enum.StudioStyleGuideColor.Tab)
 	local BrightText = GetColor(StudioTheme,Enum.StudioStyleGuideColor.BrightText)
-	
+
 	SetProperty(Frame,"BackgroundColor3",Tab)
 	SetProperty(T_Left,"TextColor3",BrightText)
 	SetProperty(T_Right,"TextColor3",BrightText)
